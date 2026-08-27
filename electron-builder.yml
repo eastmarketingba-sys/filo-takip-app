@@ -5,7 +5,7 @@ directories:
 publish:
   provider: github
   owner: eastmarketingba-sys
-  repo: Filo-takip
+  repo: filo-takip-app
   releaseType: release
 files:
   - src/**/*
