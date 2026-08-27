@@ -1,0 +1,25 @@
+{
+  "name": "filo-takip",
+  "version": "1.8.0",
+  "description": "Filo Takip - Kiralık araç takip masaüstü uygulaması",
+  "private": true,
+  "main": "src/main/index.js",
+  "scripts": {
+    "dev": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "build:win": "electron-builder --win nsis",
+    "publish:win": "electron-builder --win nsis --publish always"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "better-sqlite3": "^11.3.0",
+    "electron-updater": "^6.8.9",
+    "node-machine-id": "^1.1.12",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "electron": "^32.1.2",
+    "electron-builder": "^25.1.7"
+  }
+}

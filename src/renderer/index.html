@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filo Takip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand" id="brandHome" data-i18n-title="brand.homeTitle" title="Ana sayfa (Araçlar)">
+      <div class="mark">FT</div>
+      <div>
+        <h1>Filo Takip</h1>
+        <span data-i18n="brand.tagline">Kiralık araç takip ve analiz</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div class="tabs">
+        <button class="tab-btn" data-tab="bugun" data-i18n="tabs.bugun">Bugün</button>
+        <button class="tab-btn active" data-tab="araclar" data-i18n="tabs.araclar">Araçlar</button>
+        <button class="tab-btn" data-tab="dokuman" data-i18n="tabs.dokuman">Doküman</button>
+        <button class="tab-btn" data-tab="randevu" data-i18n="tabs.randevu">Randevu</button>
+        <button class="tab-btn" data-tab="analiz" data-i18n="tabs.analiz">Analiz</button>
+        <button class="tab-btn" data-tab="musteriler" data-i18n="tabs.musteriler">Müşteriler</button>
+      </div>
+      <div class="lang-wrap" id="langWrap">
+        <button class="lang-btn" id="langBtn" type="button" data-i18n-title="lang.btnTitle" title="Dil / Language / Jezik">🌐</button>
+        <div class="lang-menu hidden" id="langMenu">
+          <button type="button" class="lang-opt" data-lang="tr">🇹🇷 <span data-i18n="lang.tr">Türkçe</span></button>
+          <button type="button" class="lang-opt" data-lang="en">🇬🇧 <span data-i18n="lang.en">English</span></button>
+          <button type="button" class="lang-opt" data-lang="bs">🇧🇦 <span data-i18n="lang.bs">Bosanski</span></button>
+        </div>
+      </div>
+      <div class="profile-wrap" id="profileWrap">
+        <button class="profile-btn" id="profileBtn" type="button" data-i18n-title="profile.btnTitle" title="Profil ve Ayarlar">
+          <img id="profileBtnImg" style="display:none;">
+          <span id="profileBtnInitials">?</span>
+        </button>
+        <div class="profile-menu hidden" id="profileMenu">
+          <div class="profile-menu-head">
+            <button type="button" class="profile-photo-wrap" id="profilePhotoWrap" data-i18n-title="profile.photoChangeTitle" title="Profil fotoğrafını değiştir">
+              <img id="profileMenuImg" style="display:none;">
+              <span id="profileMenuInitials" class="profile-photo-fallback">?</span>
+            </button>
+            <input type="text" id="displayNameInput" data-i18n-placeholder="profile.namePlaceholder" placeholder="Adınız">
+          </div>
+          <input type="file" accept="image/*" id="profilePhotoInput" style="display:none;">
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-row"><span data-i18n="profile.version">Sürüm</span><b id="appVersionText">-</b></div>
+            <button class="btn btn-sm" id="checkUpdateBtn" style="width:100%;" data-i18n="profile.updateBtn">Güncelle</button>
+            <div class="update-status" id="updateStatusText"></div>
+          </div>
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-row"><span data-i18n="profile.backupSection">Veri Yedekleme</span></div>
+            <div class="profile-menu-row"><span data-i18n="profile.lastAutoBackup">Son otomatik yedek</span><b id="autoBackupStatusText">-</b></div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm" id="backupExportBtn" style="flex:1;" data-i18n="profile.backupExport">Yedek Al</button>
+              <button class="btn btn-sm" id="backupImportBtn" style="flex:1;" data-i18n="profile.backupImport">Geri Yükle</button>
+            </div>
+            <div class="update-status" id="backupStatusText"></div>
+          </div>
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-row"><span data-i18n="profile.deletedSection">Silinenler</span></div>
+            <button class="btn btn-sm" id="silinenlerBtn" style="width:100%;" data-i18n="profile.viewDeleted">Silinenler'i Görüntüle</button>
+          </div>
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-row"><span data-i18n="sync.section">Cihaz Eşleştirme</span></div>
+            <button class="btn btn-sm" id="syncBtn" style="width:100%;" data-i18n="sync.openBtn">Eşleştir</button>
+          </div>
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-row"><span data-i18n="profile.activationSection">Aktivasyon</span></div>
+            <button class="btn btn-sm" id="activationChangeBtn" style="width:100%;" data-i18n="profile.activationChangeBtn">Aktivasyon Kodunu Değiştir</button>
+            <div class="update-status" id="activationChangeStatusText"></div>
+          </div>
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-legal">
+              <b data-i18n="profile.legalTitle">Yasal Bilgilendirme</b><br>
+              <span data-i18n="profile.legalText">Bu yazılımın kullanım hakkı, size verilen aktivasyon koduna bağlıdır. Aktivasyon kodunun üçüncü kişilere satılması, devredilmesi veya paylaşılması kesinlikle yasaktır ve tespiti halinde lisansın iptaline neden olur. Yazılım "olduğu gibi" sunulmaktadır, verilerinizin yedeklenmesi kullanıcı sorumluluğundadır.</span>
+            </div>
+          </div>
+
+          <div class="profile-menu-section">
+            <div class="profile-menu-row"><span data-i18n="profile.contact">İletişim</span></div>
+            <a href="mailto:Eastmarketing.ba@gmail.com" class="profile-contact">Eastmarketing.ba@gmail.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-bugun">
+    <div class="bugun-wrap">
+      <div class="bugun-summary" id="bugunSummary"></div>
+      <div class="bugun-columns">
+        <div class="bugun-col">
+          <h3 data-i18n="bugun.departuresTitle">→ Bugün Teslim Edilecekler (Çıkış)</h3>
+          <div id="bugunDepartures"></div>
+        </div>
+        <div class="bugun-col">
+          <h3 data-i18n="bugun.returnsTitle">← Bugün Alınacaklar (Dönüş)</h3>
+          <div id="bugunReturns"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view active" id="view-araclar">
+    <div class="araclar-layout">
+      <div class="car-sidebar">
+        <div class="car-sidebar-top">
+          <button class="btn btn-primary" id="btnAddCar" style="width:100%;" data-i18n="car.addBtn">+ Araç Ekle</button>
+          <input type="text" id="carSearch" data-i18n-placeholder="car.searchPlaceholder" placeholder="Araç adı veya plaka ara...">
+        </div>
+        <div class="car-sidebar-list" id="carSidebarList"></div>
+      </div>
+      <div class="car-detail-pane">
+        <div class="empty" id="carDetailEmpty"><div class="big" data-i18n="car.selectPrompt">Bir araç seçin</div><span data-i18n="car.selectHintAraclar">Soldaki listeden bir araca tıklayınca detayları ve takvimi burada görünür.</span></div>
+        <div id="carDetailContent" style="display:none;flex-direction:column;height:100%;">
+          <div class="detail-head" id="carDetailTop"></div>
+          <div class="car-calendar-wrap">
+            <div class="cal-nav">
+              <button type="button" class="dp-nav-btn" id="calPrevBtn">‹</button>
+              <span class="cal-title zoomable" id="calTitle"></span>
+              <button type="button" class="dp-nav-btn" id="calNextBtn">›</button>
+            </div>
+            <div class="cal-weekdays" id="calWeekdays"></div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="dp-grid hidden" id="calGridAlt" style="padding:4px 0;"></div>
+            <div class="cal-legend">
+              <span><i class="cal-dot white"></i><span data-i18n="cal.empty">Boş</span></span>
+              <span><i class="cal-dot red"></i><span data-i18n="cal.full">Dolu (geçmiş/bugün)</span></span>
+              <span><i class="cal-dot yellow"></i><span data-i18n="cal.reserved">Rezervasyon (ileri tarih)</span></span>
+              <span><i class="cal-dot blue"></i><span data-i18n="cal.handoverDay">Devir günü</span></span>
+              <span data-i18n="cal.legendArrows">→ Teslim günü · ← Alış günü</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-dokuman">
+    <div class="araclar-layout">
+      <div class="car-sidebar">
+        <div class="car-sidebar-top">
+          <input type="text" id="dokSearch" data-i18n-placeholder="car.searchPlaceholder" placeholder="Araç adı veya plaka ara...">
+        </div>
+        <div class="car-sidebar-list" id="dokCarList"></div>
+      </div>
+      <div class="car-detail-pane">
+        <div class="empty" id="dokEmpty"><div class="big" data-i18n="car.selectPrompt">Bir araç seçin</div><span data-i18n="dok.selectHint">Soldaki listeden bir araca tıklayınca kiralama dökümü tablo halinde burada görünür.</span></div>
+        <div id="dokContent" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+          <div class="detail-head" id="dokTop"></div>
+          <div class="dok-toolbar">
+            <button class="btn btn-sm" id="dokPrintBtn" data-i18n="dok.printBtn">🖨 Yazdır</button>
+            <button class="btn btn-sm" id="dokCsvBtn" data-i18n="dok.csvBtn">⬇ CSV İndir</button>
+          </div>
+          <div id="dokTableWrap" style="flex:1;overflow:auto;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-randevu">
+    <div class="analiz-filter">
+      <div class="fld"><label data-i18n="field.deliveryDate">Teslim Tarihi</label><div class="dpicker" id="dp_rvStart"></div></div>
+      <div class="fld" style="min-width:120px;"><label data-i18n="field.deliveryTime">Teslim Saati</label><input type="time" id="rvStartTime"></div>
+      <div class="fld"><label data-i18n="field.pickupDate">Alış Tarihi</label><div class="dpicker" id="dp_rvEnd"></div></div>
+      <div class="fld" style="min-width:120px;"><label data-i18n="field.pickupTime">Alış Saati</label><input type="time" id="rvEndTime"></div>
+      <button class="btn btn-primary" id="rvSearchBtn" style="height:39px;" data-i18n="randevu.searchBtn">Müsaitleri Göster</button>
+    </div>
+    <div id="rvResults"></div>
+  </div>
+
+  <div class="view" id="view-analiz">
+    <div class="analiz-filter">
+      <div class="fld"><label data-i18n="analiz.startLabel">Başlangıç</label><div class="dpicker" id="dp_anzStart"></div></div>
+      <div class="fld"><label data-i18n="analiz.endLabel">Bitiş</label><div class="dpicker" id="dp_anzEnd"></div></div>
+    </div>
+    <div class="chip-row">
+      <button class="btn btn-chip" data-range="30" data-i18n="analiz.last30">Son 30 Gün</button>
+      <button class="btn btn-chip" data-range="90" data-i18n="analiz.last3m">Son 3 Ay</button>
+      <button class="btn btn-chip" data-range="180" data-i18n="analiz.last6m">Son 6 Ay</button>
+      <button class="btn btn-chip active" data-range="365" data-i18n="analiz.last12m">Son 12 Ay</button>
+    </div>
+    <div class="search-row"><input type="text" id="anzSearch" data-i18n-placeholder="car.searchPlaceholder" placeholder="Araç adı veya plaka ara..."></div>
+    <div class="metrics" id="anzMetrics"></div>
+    <div class="panel">
+      <h3 data-i18n="analiz.topRented">En Çok Kiralanan Araçlar</h3>
+      <div class="tag-list" id="anzTop"></div>
+    </div>
+    <div class="panel">
+      <h3 data-i18n="analiz.neverRented">Hiç Kiralanmayan Araçlar (seçili aralıkta)</h3>
+      <div class="tag-list" id="anzIdle"></div>
+    </div>
+    <div class="panel">
+      <h3 data-i18n="analiz.usageTableTitle">Araç Bazlı Kullanım Tablosu</h3><span style="font-weight:400;color:var(--muted);font-size:12px;" data-i18n="analiz.usageTableHint">— satıra tıkla, kiracı geçmişini gör</span>
+      <table>
+        <thead><tr><th data-i18n="analiz.col.car">Araç</th><th data-i18n="analiz.col.plate">Plaka</th><th data-i18n="analiz.col.rentalCount">Kiralama</th><th data-i18n="analiz.col.rentedDays">Kiralanan Gün</th><th data-i18n="analiz.col.usage">Kullanım</th><th data-i18n="analiz.col.revenue">Gelir</th></tr></thead>
+        <tbody id="anzTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="view" id="view-musteriler">
+    <div class="search-row"><input type="text" id="custSearch" data-i18n-placeholder="cust.searchPlaceholder" placeholder="Müşteri adı ara..."></div>
+    <div id="custGrid" class="cust-grid"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalCar">
+  <div class="modal">
+    <div class="modal-head"><h2 id="carModalTitle" data-i18n="car.modalAddTitle">Araç Ekle</h2><button class="close-x" data-close="modalCar">×</button></div>
+    <label data-i18n="car.photoLabel">Fotoğraf</label>
+    <div class="dropzone" id="dzCar">
+      <div class="dz-label" data-i18n="car.photoClickHint">Fotoğraf seçmek için tıkla</div>
+    </div>
+    <input type="file" accept="image/*" id="carPhotoInput" style="display:none;">
+    <label data-i18n="car.nameLabel">Araç Adı / Modeli</label>
+    <input type="text" id="carName" data-i18n-placeholder="car.namePlaceholder" placeholder="Örn: Renault Clio">
+    <div class="row2">
+      <div><label data-i18n="car.plateLabel">Plaka</label><input type="text" id="carPlate" placeholder="34 ABC 123"></div>
+      <div><label data-i18n="car.avgPriceLabel">Günlük Ortalama Fiyat (€)</label><input type="number" id="carAvgPrice" min="0" placeholder="0"></div>
+    </div>
+    <label data-i18n="car.noteLabel">Not</label>
+    <textarea id="carNote" data-i18n-placeholder="car.notePlaceholder" placeholder="Araçla ilgili not (opsiyonel)"></textarea>
+    <div class="modal-actions">
+      <button class="btn" id="carDeleteBtn" style="display:none;margin-right:auto;color:var(--red);" data-i18n="common.delete">Sil</button>
+      <button class="btn" data-close="modalCar" data-i18n="common.cancel">Vazgeç</button>
+      <button class="btn btn-primary" id="carSaveBtn" data-i18n="common.save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalDayRentals">
+  <div class="modal">
+    <div class="modal-head"><h2 id="dayRentalsTitle" data-i18n="daymodal.title">Gün Detayı</h2><button class="close-x" data-close="modalDayRentals">×</button></div>
+    <div id="dayRentalsList"></div>
+    <button class="btn btn-primary" id="dayRentalsAddBtn" style="width:100%;margin-top:10px;" data-i18n="daymodal.addBtn">+ Bu Tarihe Randevu Ekle</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalRental">
+  <div class="modal">
+    <div class="modal-head"><h2 id="rentalModalTitle" data-i18n="rental.modalAddTitle">Kiralama Ekle</h2><button class="close-x" data-close="modalRental">×</button></div>
+    <div class="row2">
+      <div><label data-i18n="field.deliveryDate">Teslim Tarihi</label><div class="dpicker" id="dp_rStart"></div></div>
+      <div><label data-i18n="field.deliveryTime">Teslim Saati</label><input type="time" id="rStartTime"></div>
+    </div>
+    <div class="row2">
+      <div><label data-i18n="field.pickupDate">Alış Tarihi</label><div class="dpicker" id="dp_rEnd"></div></div>
+      <div><label data-i18n="field.pickupTime">Alış Saati</label><input type="time" id="rEndTime"></div>
+    </div>
+    <label id="rPriceLabel" data-i18n="rental.priceLabelDaily">Günlük Fiyat (€)</label>
+    <div class="price-mode-toggle" id="priceModeToggle">
+      <button type="button" class="btn btn-sm active" data-mode="daily" data-i18n="rental.modeDailyBtn">Günlük</button>
+      <button type="button" class="btn btn-sm" data-mode="total" data-i18n="rental.modeTotalBtn">Toplam</button>
+    </div>
+    <input type="number" id="rPrice" min="0" placeholder="0">
+    <label data-i18n="rental.destinationLabel">Hedef (Varış Yeri)</label>
+    <input type="text" id="rDestination" data-i18n-placeholder="rental.destinationPlaceholder" placeholder="Örn: İstanbul">
+    <label data-i18n="rental.renterNameLabel">Kiracı Adı</label>
+    <input type="text" id="rName" data-i18n-placeholder="rental.renterNamePlaceholder" placeholder="Ad Soyad">
+    <label data-i18n="rental.renterPhoneLabel">Kiracı Telefonu</label>
+    <input type="text" id="rPhone" data-i18n-placeholder="rental.renterPhonePlaceholder" placeholder="05XX XXX XX XX">
+    <label data-i18n="rental.renterPhotoLabel">Kiracı Fotoğrafı</label>
+    <div class="dropzone" id="dzRenter">
+      <div class="dz-label" data-i18n="car.photoClickHint">Fotoğraf seçmek için tıkla</div>
+    </div>
+    <input type="file" accept="image/*" id="renterPhotoInput" style="display:none;">
+    <label data-i18n="field.noteOptional">Not (opsiyonel)</label>
+    <textarea id="rNote" rows="2" data-i18n-placeholder="rental.notePlaceholder" placeholder="Örn: teslim alınırken hasar/km notu..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" data-close="modalRental" data-i18n="common.cancel">Vazgeç</button>
+      <button class="btn btn-primary" id="rentalSaveBtn" data-i18n="common.save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalHistory">
+  <div class="modal">
+    <div class="modal-head"><h2 id="histTitle" data-i18n="hist.defaultTitle">Kiracı Geçmişi</h2><button class="close-x" data-close="modalHistory">×</button></div>
+    <div id="histList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalHandover">
+  <div class="modal">
+    <div class="modal-head"><h2 id="handoverTitle" data-i18n="handover.defaultTitle">Teslim</h2><button class="close-x" data-close="modalHandover">×</button></div>
+    <div id="handoverInfo" style="font-size:13px;color:var(--ink2);margin-bottom:10px;"></div>
+    <label data-i18n="field.noteOptional">Not (opsiyonel)</label>
+    <textarea id="handoverNote" rows="3" data-i18n-placeholder="handover.notePlaceholder" placeholder="Örn: hasar/km notu..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" id="handoverUndoBtn" style="display:none;margin-right:auto;color:var(--red);" data-i18n="handover.undoBtn">İptal Et</button>
+      <button class="btn" data-close="modalHandover" data-i18n="common.cancel">Vazgeç</button>
+      <button class="btn btn-primary" id="handoverConfirmBtn" data-i18n="handover.confirmBtnDefault">Onayla</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalSilinenler">
+  <div class="modal wide">
+    <div class="modal-head"><h2 data-i18n="profile.deletedSection">Silinenler</h2><button class="close-x" data-close="modalSilinenler">×</button></div>
+    <div id="silinenlerList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalSync">
+  <div class="modal">
+    <div class="modal-head"><h2 data-i18n="sync.modalTitle">Cihaz Eşleştirme</h2><button class="close-x" data-close="modalSync">×</button></div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;" data-i18n="sync.explain">Aynı aktivasyon kodunu kullanan diğer bilgisayarlardan birinin verisini bu bilgisayara getirebilir, ya da bu bilgisayarın verisini diğerlerinin görebilmesi için paylaşabilirsiniz.</div>
+    <button class="btn" id="syncPushBtn" style="width:100%;margin-bottom:14px;" data-i18n="sync.pushBtn">Bu Bilgisayarın Verisini Paylaş</button>
+    <div id="syncDeviceList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalCustomer">
+  <div class="modal wide">
+    <div class="modal-head"><h2 data-i18n="cust.modalTitle">Müşteri Profili</h2><button class="close-x" data-close="modalCustomer">×</button></div>
+    <div id="custDetailBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modalPhotoView">
+  <div class="modal" style="max-width:420px;text-align:center;">
+    <div class="modal-head"><h2 data-i18n="photo.modalTitle">Fotoğraf</h2><button class="close-x" data-close="modalPhotoView">×</button></div>
+    <img id="photoViewImg" style="width:100%;border-radius:10px;max-height:55vh;object-fit:contain;background:var(--bg);">
+    <div id="photoViewEmpty" style="display:none;color:var(--muted);padding:50px 0;font-size:13px;" data-i18n="photo.none">Fotoğraf yok</div>
+    <input type="file" accept="image/*" id="photoViewChangeInput" style="display:none;">
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="photoViewChangeBtn" data-i18n="photo.changeBtn">Fotoğrafı Değiştir</button>
+    </div>
+  </div>
+</div>
+
+<div class="activation-overlay hidden" id="activationGate">
+  <div class="modal">
+    <div class="modal-head"><h2 data-i18n="activation.title">Filo Takip — Etkinleştirme</h2></div>
+    <p style="font-size:13px;color:var(--ink2);margin-top:0;" data-i18n="activation.desc">Devam etmek için lisans aktivasyon kodunuzu girin.</p>
+    <label data-i18n="activation.codeLabel">Aktivasyon Kodu</label>
+    <input type="text" id="actCodeInput" placeholder="FILO-XXXX-XXXX-XXXX">
+    <div class="act-error" id="actError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="actSubmitBtn" data-i18n="activation.submitBtn">Etkinleştir</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/state.js"></script>
+<script src="js/datepicker.js"></script>
+<script src="js/ui-helpers.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/araclar.js"></script>
+<script src="js/dokuman.js"></script>
+<script src="js/bugun.js"></script>
+<script src="js/randevu.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/customers.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/silinenler.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>
