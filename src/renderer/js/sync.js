@@ -33,7 +33,10 @@ async function renderSyncDeviceList(){
       if(!res.ok){
         showToast('✕ ' + t('sync.pullFailed'));
         btn.disabled = false;
+        return;
       }
+      showToast(t('sync.pullMergedToast',{cars:res.addedCars,rentals:res.addedRentals}));
+      setTimeout(()=> location.reload(), 900);
     });
   });
 }

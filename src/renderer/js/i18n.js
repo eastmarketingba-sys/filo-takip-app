@@ -258,7 +258,8 @@ const TRANSLATIONS = {
     'sync.lastSeen': 'Son görülme: {{date}}',
     'sync.listError': 'Cihaz listesi alınamadı. İnternet bağlantınızı kontrol edin.',
     'sync.noOtherDevices': 'Eşleştirilmiş başka cihaz yok.',
-    'sync.confirmPull': 'Bu işlem bu bilgisayardaki mevcut tüm araç ve kiralama verilerinin üzerine yazacak. Devam etmek istiyor musunuz?'
+    'sync.confirmPull': 'Bu işlem diğer bilgisayardaki verileri bu bilgisayara ekleyecek. Zaten var olan araç/kiralama kayıtları atlanacak, mevcut verileriniz silinmeyecek. Devam etmek istiyor musunuz?',
+    'sync.pullMergedToast': '✓ {{cars}} yeni araç, {{rentals}} yeni kiralama eklendi'
   },
 
   en: {
@@ -517,7 +518,8 @@ const TRANSLATIONS = {
     'sync.lastSeen': 'Last seen: {{date}}',
     'sync.listError': 'Could not load device list. Check your internet connection.',
     'sync.noOtherDevices': 'No other paired devices yet.',
-    'sync.confirmPull': 'This will overwrite all current car and rental data on this computer. Do you want to continue?'
+    'sync.confirmPull': "This will add the other computer's data to this computer. Vehicle/rental records that already exist here will be skipped — your existing data will not be deleted. Do you want to continue?",
+    'sync.pullMergedToast': '✓ Added {{cars}} new vehicles, {{rentals}} new rentals'
   },
 
   bs: {
@@ -776,7 +778,8 @@ const TRANSLATIONS = {
     'sync.lastSeen': 'Zadnji put viđen: {{date}}',
     'sync.listError': 'Nije moguće učitati listu uređaja. Provjerite internet vezu.',
     'sync.noOtherDevices': 'Nema drugih uparenih uređaja.',
-    'sync.confirmPull': 'Ovo će prepisati sve trenutne podatke o vozilima i iznajmljivanjima na ovom računaru. Želite li nastaviti?'
+    'sync.confirmPull': 'Ovo će dodati podatke s drugog računara na ovaj računar. Vozila/iznajmljivanja koja već postoje biće preskočena — vaši postojeći podaci neće biti obrisani. Želite li nastaviti?',
+    'sync.pullMergedToast': '✓ Dodano {{cars}} novih vozila, {{rentals}} novih iznajmljivanja'
   }
 };
 
