@@ -1,6 +1,6 @@
 {
   "name": "filo-takip",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "description": "Filo Takip - Kiralık araç takip masaüstü uygulaması",
   "private": true,
   "main": "src/main/index.js",
