@@ -1,60 +1,82 @@
 const { ipcMain } = require('electron');
-const { getDb } = require('../db');
+const { getSupabaseClient } = require('../supabaseClient');
+const { getCurrentProfile } = require('../session');
 const { archiveDeletedCar } = require('../deletedArchive');
 
 function rowToCar(row) {
   return {
-    id: String(row.id),
+    id: row.id,
     name: row.name,
     plate: row.plate,
     photo: row.photo,
-    avgPrice: row.avg_price,
+    // Postgres'in "numeric" tipi, ondalık hassasiyet kaybı olmasın diye PostgREST
+    // üzerinden JS'e STRING olarak döner - renderer'daki fiyat aritmetiği bozulmasın
+    // diye burada açıkça sayıya çeviriyoruz.
+    avgPrice: row.avg_price != null ? Number(row.avg_price) : null,
     note: row.note,
     favorite: !!row.favorite
   };
 }
 
 function registerCarsIpc() {
-  ipcMain.handle('cars:list', () => {
-    const rows = getDb().prepare('SELECT * FROM cars ORDER BY id ASC').all();
-    return rows.map(rowToCar);
+  ipcMain.handle('cars:list', async () => {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.from('cars').select('*').order('created_at', { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data || []).map(rowToCar);
   });
 
-  ipcMain.handle('cars:add', (event, data) => {
+  ipcMain.handle('cars:add', async (event, data) => {
+    const supabase = getSupabaseClient();
+    const profile = getCurrentProfile();
+    if (!profile) throw new Error('not_authenticated');
     const { name, plate, photo, avgPrice, note } = data || {};
-    const info = getDb()
-      .prepare('INSERT INTO cars (name, plate, photo, avg_price, note) VALUES (?, ?, ?, ?, ?)')
-      .run(name, plate || null, photo || null, avgPrice != null ? avgPrice : null, note || null);
-    const row = getDb().prepare('SELECT * FROM cars WHERE id = ?').get(info.lastInsertRowid);
+    const { data: row, error } = await supabase
+      .from('cars')
+      .insert({
+        org_id: profile.orgId,
+        name,
+        plate: plate || null,
+        photo: photo || null,
+        avg_price: avgPrice != null ? avgPrice : null,
+        note: note || null,
+        created_by: profile.id,
+        updated_by: profile.id
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
     return rowToCar(row);
   });
 
-  ipcMain.handle('cars:update', (event, id, patch) => {
-    const db = getDb();
-    const existing = db.prepare('SELECT * FROM cars WHERE id = ?').get(id);
-    if (!existing) return null;
+  ipcMain.handle('cars:update', async (event, id, patch) => {
+    const supabase = getSupabaseClient();
+    const profile = getCurrentProfile();
+    if (!profile) throw new Error('not_authenticated');
     patch = patch || {};
-    const name = patch.name !== undefined ? patch.name : existing.name;
-    const plate = patch.plate !== undefined ? patch.plate : existing.plate;
-    const photo = patch.photo !== undefined ? patch.photo : existing.photo;
-    const avgPrice = patch.avgPrice !== undefined ? patch.avgPrice : existing.avg_price;
-    const note = patch.note !== undefined ? patch.note : existing.note;
-    const favorite = patch.favorite !== undefined ? (patch.favorite ? 1 : 0) : existing.favorite;
-    db.prepare(
-      `UPDATE cars SET name = ?, plate = ?, photo = ?, avg_price = ?, note = ?, favorite = ?, updated_at = datetime('now') WHERE id = ?`
-    ).run(name, plate, photo, avgPrice, note, favorite, id);
-    const row = db.prepare('SELECT * FROM cars WHERE id = ?').get(id);
+    const updates = { updated_by: profile.id, updated_at: new Date().toISOString() };
+    if (patch.name !== undefined) updates.name = patch.name;
+    if (patch.plate !== undefined) updates.plate = patch.plate;
+    if (patch.photo !== undefined) updates.photo = patch.photo;
+    if (patch.avgPrice !== undefined) updates.avg_price = patch.avgPrice;
+    if (patch.note !== undefined) updates.note = patch.note;
+    if (patch.favorite !== undefined) updates.favorite = !!patch.favorite;
+    const { data: row, error } = await supabase.from('cars').update(updates).eq('id', id).select().single();
+    if (error) throw new Error(error.message);
     return rowToCar(row);
   });
 
-  ipcMain.handle('cars:delete', (event, id) => {
-    const db = getDb();
-    const carRow = db.prepare('SELECT * FROM cars WHERE id = ?').get(id);
+  ipcMain.handle('cars:delete', async (event, id) => {
+    const supabase = getSupabaseClient();
+    const { data: carRow } = await supabase.from('cars').select('*').eq('id', id).single();
     if (carRow) {
-      const rentalRows = db.prepare('SELECT * FROM rentals WHERE car_id = ?').all(id);
-      archiveDeletedCar(carRow, rentalRows);
+      const { data: rentalRows } = await supabase.from('rentals').select('*').eq('car_id', id);
+      archiveDeletedCar(carRow, rentalRows || []);
     }
-    db.prepare('DELETE FROM cars WHERE id = ?').run(id);
+    // Silme yetkisi RLS'te admin ile sınırlı (bkz. supabase/orgs_and_auth.sql,
+    // cars_delete policy) - admin olmayan bir çağrı burada hata alır.
+    const { error } = await supabase.from('cars').delete().eq('id', id);
+    if (error) throw new Error(error.message);
     return true;
   });
 }

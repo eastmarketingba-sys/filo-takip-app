@@ -71,15 +71,19 @@
             <button class="btn btn-sm" id="silinenlerBtn" style="width:100%;" data-i18n="profile.viewDeleted">Silinenler'i Görüntüle</button>
           </div>
 
-          <div class="profile-menu-section">
-            <div class="profile-menu-row"><span data-i18n="sync.section">Cihaz Eşleştirme</span></div>
-            <button class="btn btn-sm" id="syncBtn" style="width:100%;" data-i18n="sync.openBtn">Eşleştir</button>
+          <div class="profile-menu-section hidden" id="teamMenuSection">
+            <div class="profile-menu-row"><span data-i18n="team.section">Ekip</span></div>
+            <button class="btn btn-sm" id="teamBtn" style="width:100%;" data-i18n="team.openBtn">Ekibi Yönet</button>
           </div>
 
           <div class="profile-menu-section">
             <div class="profile-menu-row"><span data-i18n="profile.activationSection">Aktivasyon</span></div>
             <button class="btn btn-sm" id="activationChangeBtn" style="width:100%;" data-i18n="profile.activationChangeBtn">Aktivasyon Kodunu Değiştir</button>
             <div class="update-status" id="activationChangeStatusText"></div>
+          </div>
+
+          <div class="profile-menu-section">
+            <button class="btn btn-sm" id="logoutBtn" style="width:100%;color:var(--red);" data-i18n="auth.logoutBtn">Çıkış Yap</button>
           </div>
 
           <div class="profile-menu-section">
@@ -315,12 +319,26 @@
   </div>
 </div>
 
-<div class="modal-overlay hidden" id="modalSync">
-  <div class="modal">
-    <div class="modal-head"><h2 data-i18n="sync.modalTitle">Cihaz Eşleştirme</h2><button class="close-x" data-close="modalSync">×</button></div>
-    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;" data-i18n="sync.explain">Aynı aktivasyon kodunu kullanan diğer bilgisayarlardan birinin verisini bu bilgisayara getirebilir, ya da bu bilgisayarın verisini diğerlerinin görebilmesi için paylaşabilirsiniz.</div>
-    <button class="btn" id="syncPushBtn" style="width:100%;margin-bottom:14px;" data-i18n="sync.pushBtn">Bu Bilgisayarın Verisini Paylaş</button>
-    <div id="syncDeviceList"></div>
+<div class="modal-overlay hidden" id="modalTeam">
+  <div class="modal wide">
+    <div class="modal-head"><h2 data-i18n="team.modalTitle">Ekip Yönetimi</h2><button class="close-x" data-close="modalTeam">×</button></div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;" data-i18n="team.explain">Kurumunuzdaki çalışanları buradan davet edebilir veya kaldırabilirsiniz.</div>
+    <div class="row2">
+      <div>
+        <label data-i18n="team.inviteEmailLabel">Çalışan E-postası</label>
+        <input type="email" id="teamInviteEmail" placeholder="calisan@ornek.com">
+      </div>
+      <div>
+        <label data-i18n="team.inviteRoleLabel">Rol</label>
+        <select id="teamInviteRole">
+          <option value="user" data-i18n="team.roleUser">Çalışan</option>
+          <option value="admin" data-i18n="team.roleAdmin">Yönetici</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="teamInviteBtn" style="width:100%;margin-bottom:14px;" data-i18n="team.inviteBtn">+ Davet Gönder</button>
+    <div id="teamInviteStatus" class="update-status" style="margin-bottom:10px;"></div>
+    <div id="teamMemberList"></div>
   </div>
 </div>
 
@@ -356,6 +374,21 @@
   </div>
 </div>
 
+<div class="activation-overlay hidden" id="authGate">
+  <div class="modal">
+    <div class="modal-head"><h2 data-i18n="auth.title">Giriş Yap</h2></div>
+    <p style="font-size:13px;color:var(--ink2);margin-top:0;" data-i18n="auth.desc">Devam etmek için çalışan hesabınızla giriş yapın.</p>
+    <label data-i18n="auth.emailLabel">E-posta</label>
+    <input type="email" id="authEmailInput" autocomplete="username">
+    <label data-i18n="auth.passwordLabel">Şifre</label>
+    <input type="password" id="authPasswordInput" autocomplete="current-password">
+    <div class="act-error" id="authError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="authSubmitBtn" data-i18n="auth.loginBtn">Giriş Yap</button>
+    </div>
+  </div>
+</div>
+
 <script src="js/i18n.js"></script>
 <script src="js/state.js"></script>
 <script src="js/datepicker.js"></script>
@@ -369,7 +402,8 @@
 <script src="js/customers.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/silinenler.js"></script>
-<script src="js/sync.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/team.js"></script>
 <script src="js/init.js"></script>
 </body>
 </html>

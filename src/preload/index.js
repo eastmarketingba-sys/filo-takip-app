@@ -23,6 +23,17 @@ contextBridge.exposeInMainWorld('api', {
     activate: (code) => ipcRenderer.invoke('activation:activate', code),
     deactivate: () => ipcRenderer.invoke('activation:deactivate')
   },
+  auth: {
+    getSession: () => ipcRenderer.invoke('auth:getSession'),
+    signIn: (email, password) => ipcRenderer.invoke('auth:signIn', email, password),
+    signOut: () => ipcRenderer.invoke('auth:signOut'),
+    getProfile: () => ipcRenderer.invoke('auth:getProfile')
+  },
+  team: {
+    list: () => ipcRenderer.invoke('team:list'),
+    invite: (payload) => ipcRenderer.invoke('team:invite', payload),
+    remove: (userId) => ipcRenderer.invoke('team:remove', userId)
+  },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     set: (patch) => ipcRenderer.invoke('settings:set', patch)
@@ -42,10 +53,5 @@ contextBridge.exposeInMainWorld('api', {
     list: () => ipcRenderer.invoke('archive:list'),
     restore: (id) => ipcRenderer.invoke('archive:restore', id),
     delete: (id) => ipcRenderer.invoke('archive:delete', id)
-  },
-  sync: {
-    listDevices: () => ipcRenderer.invoke('sync:listDevices'),
-    push: () => ipcRenderer.invoke('sync:push'),
-    pull: (machineId) => ipcRenderer.invoke('sync:pull', machineId)
   }
 });
