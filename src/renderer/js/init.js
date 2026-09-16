@@ -53,5 +53,12 @@ async function startApp(){
     showActivationGate();
     return;
   }
+  const session = await window.api.auth.getSession();
+  if(!session.loggedIn){
+    showAuthGate();
+    return;
+  }
+  currentProfile = session.profile;
+  applyRoleVisibility();
   await startApp();
 })();

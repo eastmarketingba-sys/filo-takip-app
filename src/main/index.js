@@ -8,14 +8,19 @@ app.commandLine.appendSwitch('lang', 'tr');
 const { registerCarsIpc } = require('./ipc/cars');
 const { registerRentalsIpc } = require('./ipc/rentals');
 const { registerActivationIpc } = require('./ipc/activation');
+const { registerAuthIpc } = require('./ipc/auth');
+const { registerTeamIpc } = require('./ipc/team');
 const { registerSettingsIpc } = require('./ipc/settings');
 const { registerUpdateIpc } = require('./ipc/update');
 const { registerBackupIpc } = require('./ipc/backup');
 const { registerArchiveIpc } = require('./ipc/archive');
-const { registerSyncIpc } = require('./ipc/sync');
 const { initUpdater } = require('./updater');
 const { runDailyBackupIfNeeded } = require('./autoBackup');
-const { registerThisDevice } = require('./sync');
+// NOT: cihaz-eşleştirme ("Cihaz Eşleştirme" / push-pull snapshot) özelliği kasıtlı
+// olarak burada kayıtlı değil - cars/rentals artık Supabase'de canlı ve paylaşımlı
+// olduğu için o özelliğin amacı (yerel SQLite dosyalarını manuel birleştirmek)
+// ortadan kalktı. src/main/sync.js ve src/main/ipc/sync.js dosyaları referans
+// için repoda duruyor ama artık hiçbir yerden çağrılmıyor.
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -57,14 +62,14 @@ app.whenReady().then(() => {
   registerCarsIpc();
   registerRentalsIpc();
   registerActivationIpc();
+  registerAuthIpc();
+  registerTeamIpc();
   registerSettingsIpc();
   registerUpdateIpc();
   registerBackupIpc();
   registerArchiveIpc();
-  registerSyncIpc();
   createWindow();
   runDailyBackupIfNeeded();
-  registerThisDevice();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

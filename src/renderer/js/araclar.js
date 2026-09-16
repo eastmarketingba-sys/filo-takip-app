@@ -432,7 +432,7 @@ function openEditCarModal(){
   document.getElementById('dzCar').innerHTML = c.photo
     ? `<img src="${c.photo}">`
     : `<div class="dz-label">${t('car.photoClickHint')}</div>`;
-  document.getElementById('carDeleteBtn').style.display = 'inline-block';
+  document.getElementById('carDeleteBtn').style.display = (currentProfile && currentProfile.role === 'admin') ? 'inline-block' : 'none';
   openModal('modalCar');
 }
 
